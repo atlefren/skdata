@@ -183,13 +183,7 @@ def datasets(category_id):
         click.echo('{id}: {name}'.format(**dataset))
 
 
-@click.command(help='Download all files in specified dataset')
-@click.argument('dataset_id')
-@click.argument('username')
-@click.argument('password')
-@click.option('--directory', help='directory to place result in')
-def download(dataset_id, username, password, directory):
-
+def download_impl(dataset_id, username, password, directory):
     dd = DirectDownload(dataset_id, BASE_URL)
     if dd.exists():
         session = login(username, password)
@@ -197,19 +191,36 @@ def download(dataset_id, username, password, directory):
             directory = os.path.join('dl', dataset_id)
         else:
             check_dir(directory)
-
         download_files(dd.get_links(), directory, session)
-
-        for link in dd.get_links():
-            print link
     else:
         click.echo('Download data from {dataset_id}'.format(dataset_id=dataset_id))
         download_dataset(dataset_id, username, password, directory=directory)
+
+@click.command(help='Download all files in specified dataset')
+@click.argument('dataset_id')
+@click.argument('username')
+@click.argument('password')
+@click.option('--directory', help='directory to place result in')
+def download(dataset_id, username, password, directory):
+    download_impl(dataset_id, username, password, directory)
+
+
+@click.command(help='Download all files on the server')
+@click.argument('username')
+@click.argument('password')
+@click.option('--directory', help='directory to place result in')
+def getall(username, password, directory='dl'):
+    for category in get_categories():
+        for dataset in get_datasets(category['id']):
+            d = os.path.join(directory, dataset['id'])
+            print dataset['id']
+            download_impl(dataset['id'], username, password, d)
 
 
 cli.add_command(categories)
 cli.add_command(datasets)
 cli.add_command(download)
+cli.add_command(getall)
 
 if __name__ == '__main__':
     cli()

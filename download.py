@@ -21,7 +21,6 @@ def download_file(url, save_to, session):
 def download_files(files, directory, session):
     check_dir(directory)
     for file in files:
-        print file
         filename = file.split('/')[-1]
         path = os.path.join(directory, filename)
         download_file(file, path, session)
