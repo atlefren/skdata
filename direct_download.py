@@ -24,5 +24,7 @@ class DirectDownload(object):
 
     def get_links(self):
         dataset = Dataset(self.dataset, self.base_url)
+        links = []
         for filename in dataset.get_filenames():
-            yield '%s/%s' % (self.url, filename)
+            links.append('%s/%s' % (self.url, filename))
+        return links

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+from urllib import urlencode, quote_plus
 
 
 def check_dir(directory):
