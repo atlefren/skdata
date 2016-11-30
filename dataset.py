@@ -58,7 +58,7 @@ class Dataset(object):
             filename = replace_norwegian_chars(filename)
             filenames.append(unicode(filename).encode('utf8'))
 
-        return filenames
+        return [filenames[0]]
 
     def _get_kms_widget(self):
         if self.kms_widget is None:

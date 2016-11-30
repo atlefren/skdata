@@ -10,6 +10,7 @@ from util import (get_soup, get_form_params)
 from download import download_files, check_dir
 from dataset import Dataset
 from cart import Cart
+from direct_download import DirectDownload
 
 
 BASE_URL = 'http://data.kartverket.no'
@@ -128,6 +129,40 @@ def download_dataset(dataset_id, username, password, directory=None):
     # actually download the files
     download_files(links, directory, session)
 
+'''
+def get_dataset_link(dataset_id, username, password, directory=None):
+
+    # create a dataset
+    dataset = Dataset(dataset_id, BASE_URL)
+    if not dataset.exists():
+        raise IndexError('Unknown dataset {dataset_id}'.format(dataset_id=dataset_id))
+
+    # log the user in
+    session = login(username, password)
+
+    # create a cart
+    cart = Cart(session, BASE_URL)
+
+    click.echo('Add dataset to cart')
+    # add the dataset to the cart
+    cart.add_dataset(dataset)
+
+    click.echo('place order')
+    # place the order
+    cart.place_order()
+    click.echo('order with id={order_id} placed'.format(order_id=cart.order_id))
+
+    # create a download dir if not specified
+    if directory is None:
+        directory = os.path.join('dl', cart.order_id)
+    else:
+        check_dir(directory)
+
+    links = cart.get_download_links()
+    click.echo('Downloading {len} files'.format(len=len(links)))
+    # actually download the files
+    return '/'.join(links[0].split('/')[:-1])
+'''
 
 @click.group()
 def cli():
@@ -154,8 +189,23 @@ def datasets(category_id):
 @click.argument('password')
 @click.option('--directory', help='directory to place result in')
 def download(dataset_id, username, password, directory):
-    click.echo('Download data from {dataset_id}'.format(dataset_id=dataset_id))
-    download_dataset(dataset_id, username, password, directory=directory)
+
+    dd = DirectDownload(dataset_id, BASE_URL)
+    if dd.exists():
+        session = login(username, password)
+        if directory is None:
+            directory = os.path.join('dl', dataset_id)
+        else:
+            check_dir(directory)
+
+        download_files(dd.get_links(), directory, session)
+
+        for link in dd.get_links():
+            print link
+    else:
+        click.echo('Download data from {dataset_id}'.format(dataset_id=dataset_id))
+        download_dataset(dataset_id, username, password, directory=directory)
+
 
 cli.add_command(categories)
 cli.add_command(datasets)
