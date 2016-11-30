@@ -61,7 +61,10 @@ class Cart(object):
             'http://data\.kartverket\.no/download/checkout/(\d*)/checkout',
             url2
         )
-        self.order_id = m.group(1)
+        if m is not None:
+            self.order_id = m.group(1)
+        else:
+            self.order_id = None
 
         data2 = get_form_params(
             self.session,

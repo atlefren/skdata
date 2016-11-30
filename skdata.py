@@ -117,9 +117,11 @@ def download_dataset(dataset_id, session, directory=None):
     cart.place_order()
     click.echo('order with id={order_id} placed'.format(order_id=cart.order_id))
 
-    # create a download dir if not specified
+    order_id = cart.order_id
+    if order_id is None:
+        order_id = 'unknown'
     if directory is None:
-        directory = os.path.join('dl', cart.order_id)
+        directory = os.path.join('dl', order_id)
     else:
         check_dir(directory)
 
