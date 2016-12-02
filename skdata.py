@@ -115,6 +115,7 @@ def download_dataset(dataset_id, session, directory=None):
     click.echo('place order')
     # place the order
     cart.place_order()
+
     click.echo('order with id={order_id} placed'.format(order_id=cart.order_id))
 
     order_id = cart.order_id
@@ -181,7 +182,8 @@ def getall(username, password, directory='dl'):
         for dataset in get_datasets(category['id']):
             d = os.path.join(directory, dataset['id'])
             print dataset['id']
-            download_impl(dataset['id'], session, directory=directory)
+            file_dir = os.path.join(directory, dataset['id'])
+            download_impl(dataset['id'], session, directory=file_dir)
 
 
 cli.add_command(categories)
